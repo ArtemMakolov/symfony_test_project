@@ -1,0 +1,84 @@
+nelmio_api_doc:
+    models:
+        names:
+            - { alias: ErrorShortDto, type: App\Dto\Error\ErrorShortDto }
+            - { alias: BadRequestExceptionItemDto, type: App\Dto\Error\BadRequestExceptionItemDto }
+    documentation:
+        info:
+            title: Employe
+            version: 21.12.1
+        paths:
+            /api/authentication:
+                post:
+                    tags:
+                        - Auth
+                    operationId: postCredentialsItem
+                    summary: Get JWT token to login.
+                    requestBody:
+                        description: Create new JWT Token
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/Credentials'
+                    responses:
+                        '200':
+                            description: Get JWT token
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Token'
+        components:
+            schemas:
+                Token:
+                    type: object
+                    properties:
+                        token:
+                            type: string
+                            readOnly: true
+                Credentials:
+                    type: object
+                    properties:
+                        email:
+                            type: string
+                        password:
+                            type: string
+                    required:
+                        - email
+                        - password
+                    example:
+                        email: test@test.ru
+                        password: test
+            securitySchemes:
+                bearerAuth:
+                    name: Authorization
+                    in: header
+                    type: apiKey
+                    scheme: bearer
+                    bearerFormat: JWT
+                    description: Bearer {JWT}
+            responses:
+                BadRequest:
+                    description: Неверный формат переданных данных
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/BadRequestExceptionItemDto'
+                NotAuthorized:
+                    description: Токен не передан или истёк
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorShortDto'
+                Forbidden:
+                    description: Недостаточно прав. Доступ запрещен
+                NotFound:
+                    description: Объект не найден
+                UnexpectedError:
+                    description: Возникла непредвиденная ошибка
+        security:
+            - bearerAuth: [ ]
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
